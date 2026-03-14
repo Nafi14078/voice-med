@@ -15,6 +15,8 @@ const allDoctors = [
   { id: 8, name: "Orthopedic", desc: "Helps with bone, joint, and muscle pain.", specialty: "Orthopedics", image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&h=400&fit=crop", premium: true, keywords: ["bone", "joint", "muscle", "back", "fracture", "knee"] },
   { id: 9, name: "Gynecologist", desc: "Cares for women's reproductive and hormonal health.", specialty: "Women's Health", image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop", premium: true, keywords: ["period", "pregnancy", "women", "hormone", "female"] },
   { id: 10, name: "Dentist", desc: "Handles oral hygiene and dental problems.", specialty: "Dental", image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&h=400&fit=crop", premium: true, keywords: ["tooth", "teeth", "gum", "mouth", "dental"] },
+  { id: 11, name: "Ophthalmologist", desc: "Specializes in eye care and vision problems.", specialty: "Eye Care", image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop", premium: true, keywords: ["eye", "vision", "glasses", "contact", "sight"] },
+  { id: 12, name: "Endocrinologist", desc: "Specializes in diabetes, thyroid disorders, and hormonal health.", specialty: "Endocrinology", image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop", premium: true, keywords: ["diabetes", "sugar", "insulin", "thyroid", "hormone"] },
 ];
 
 export default function DoctorsPage() {
@@ -113,7 +115,7 @@ export default function DoctorsPage() {
                   </p>
                 </div>
                 
-                <Link href="/dashboard/consult" className="mt-auto">
+                <Link href={`/consultation?name=${encodeURIComponent(doc.name)}&image=${encodeURIComponent(doc.image)}`} className="mt-auto">
                   <button className={`w-full py-3 rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 ${doc.id === aiMatchId ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-slate-900 text-white hover:bg-blue-600'}`}>
                     Start Consultation {doc.id === aiMatchId && <ArrowRight size={16} />}
                   </button>
