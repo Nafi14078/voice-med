@@ -133,10 +133,49 @@ function ConsultationContent() {
     speak(transcript[0].text);
   };
 
-  const endCall = () => {
-    setIsRecording(false);
-    setHasStarted(false);
-  };
+  // Inside ConsultationContent() in consultation/page.tsx
+
+const endCall = async () => {
+  setIsRecording(false);
+
+  try {
+    // 1. Use Groq to generate a structured report from the conversation
+    const reportResponse = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: `You are a medical scribe. Analyze the conversation transcript and provide a summary in JSON format. 
+          Keys: "title" (Short medical title), "summary" (Brief overview), "disease" (Likely condition), 
+          "symptoms" (List symptoms found), "medication" (Suggested medicines/treatment), 
+          "advice" (Doctor's advice), "urgency" (Low/Medium/High).`
+        },
+        {
+          role: "user",
+          content: JSON.stringify(transcript)
+        }
+      ],
+      model: "llama-3.3-70b-versatile",
+      response_format: { type: "json_object" }
+    });
+
+    const reportData = JSON.parse(reportResponse.choices[0].message.content || "{}");
+
+    // 2. Send the AI-generated report to our new API route
+    const response = await fetch("/api/save-report", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(reportData),
+    });
+
+    if (response.ok) {
+      // 3. Navigate back to dashboard to see the updated stats and report
+      window.location.href = "/dashboard";
+    }
+  } catch (error) {
+    console.error("Report Generation Error:", error);
+    setHasStarted(false); // Fallback to hide overlay
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#f8fafc] flex flex-col relative">
