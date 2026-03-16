@@ -18,6 +18,7 @@ function ConsultationContent() {
   const doctorImage = searchParams.get("image") || "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop";
 
   const [hasStarted, setHasStarted] = useState(false);
+  const [userCredits, setUserCredits] = useState(10);
   const [isRecording, setIsRecording] = useState(false);
   const [language, setLanguage] = useState<"EN" | "BN">("EN");
   const [transcript, setTranscript] = useState([
@@ -129,9 +130,14 @@ function ConsultationContent() {
   };
 
   const handleStartCall = () => {
-    setHasStarted(true);
-    speak(transcript[0].text);
-  };
+  if (userCredits <= 0) {
+    alert("You have exhausted your free credits. Please upgrade to Premium.");
+    window.location.href = "/pricing";
+    return;
+  }
+  setHasStarted(true);
+  speak(transcript[0].text);
+};
 
   // Inside ConsultationContent() in consultation/page.tsx
 

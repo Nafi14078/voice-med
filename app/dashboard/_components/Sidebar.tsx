@@ -1,5 +1,5 @@
 "use client"
-import { LayoutDashboard, Mic, History, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Mic, History, Settings, LogOut, Crown } from "lucide-react"; // Added Crown icon
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -10,13 +10,27 @@ const menuItems = [
   { name: "Settings", icon: <Settings size={20} />, href: "/dashboard/settings" },
 ];
 
-export default function Sidebar() {
+// Added isPremium as a prop
+export default function Sidebar({ isPremium = false }: { isPremium?: boolean }) {
   const path = usePathname();
 
   return (
-    <div className="w-64 h-screen bg-white border-r border-slate-100 flex flex-col p-6 fixed left-0 top-0">
-      <div className="flex items-center gap-2 font-bold text-xl text-blue-600 mb-10 px-2">
-        MedVoice
+    <div className="pt-20 mt-10 w-64 h-screen bg-white border-r border-slate-100 flex flex-col p-6 fixed left-0 top-0">
+      <div className="flex items-center gap-2 font-bold text-xl text-blue-600 mb-2 px-2">
+        Ai Medical Agent
+      </div>
+
+      {/* Premium Badge Section */}
+      <div className="px-2 mb-8">
+        {isPremium ? (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[10px] font-bold uppercase shadow-sm">
+            <Crown size={10} fill="currentColor" /> Premium
+          </div>
+        ) : (
+          <div className="inline-flex items-center px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-[10px] font-bold uppercase">
+            Free Tier
+          </div>
+        )}
       </div>
       
       <nav className="flex-1 space-y-2">

@@ -28,7 +28,7 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen bg-[#f8fafc] flex">
       <CheckUser />
-      <Sidebar />
+      <Sidebar isPremium={userData?.isPremium ?? false} />
 
       <main className="flex-1 mt-10 pt-20 ml-64 p-10">
         <header className="flex justify-between items-center mb-10">

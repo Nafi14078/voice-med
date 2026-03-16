@@ -28,6 +28,7 @@ export async function POST(req: Request) {
       .set({
         consultations: sql`${usersTable.consultations} + 1`,
         reportCount: sql`${usersTable.reportCount} + 1`,
+        credits: sql`${usersTable.credits} - 1`,
       })
       .where(eq(usersTable.clerkId, user.id));
 

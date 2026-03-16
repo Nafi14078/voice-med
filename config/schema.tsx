@@ -1,4 +1,4 @@
-import { integer, pgTable, varchar, text, timestamp, serial } from "drizzle-orm/pg-core";
+import { integer, pgTable, varchar, text, timestamp, serial,boolean } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 // 1. Updated Users Table
@@ -9,6 +9,7 @@ export const usersTable = pgTable("users", {
   email: varchar({ length: 255 }).notNull().unique(),
   imageUrl: text("image_url"), 
   credits: integer().default(10),
+  isPremium: boolean("is_premium").default(false),
   
   // New Stats Columns
   consultations: integer().default(0),
