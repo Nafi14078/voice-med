@@ -1,6 +1,6 @@
 "use client"
-import { useState, useEffect } from "react";
-import { Search, Mic, ArrowRight, Activity, Sparkles } from "lucide-react";
+import { useState, Suspense } from "react";
+import { Search, Activity, ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -19,15 +19,14 @@ const allDoctors = [
   { id: 12, name: "Endocrinologist", desc: "Specializes in diabetes, thyroid disorders, and hormonal health.", specialty: "Endocrinology", image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop", premium: true, keywords: ["diabetes", "sugar", "insulin", "thyroid", "hormone"] },
 ];
 
-export default function DoctorsPage() {
+function DoctorsContent() {
   const searchParams = useSearchParams();
   const symptoms = searchParams.get("symptoms")?.toLowerCase() || "";
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Logic to find the best AI match based on keywords
   const getAiMatchId = () => {
     if (!symptoms) return null;
-    let bestMatch = { id: 1, score: 0 }; // Default to General Physician
+    let bestMatch = { id: 1, score: 0 };
 
     allDoctors.forEach(doc => {
       let score = 0;
@@ -43,7 +42,6 @@ export default function DoctorsPage() {
 
   const aiMatchId = getAiMatchId();
 
-  // Filter and Sort: Put AI Match at the top if symptoms exist
   const filteredDoctors = allDoctors
     .filter(doc => 
       doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -52,87 +50,93 @@ export default function DoctorsPage() {
     .sort((a, b) => (a.id === aiMatchId ? -1 : b.id === aiMatchId ? 1 : 0));
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-20 px-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-12">
+        <h1 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+          AI Specialist Doctors Agent
+        </h1>
         
-        {/* Title and Search Bar */}
-        <div className="mb-12">
-          <h1 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-            AI Specialist Doctors Agent
-          </h1>
-          
-          <div className="relative max-w-xl">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-            <input 
-              type="text" 
-              placeholder="Search doctors by title or specialty (e.g. Pediatrician)..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-slate-700"
-            />
-          </div>
-
-          {symptoms && (
-            <div className="mt-4 flex items-center gap-2 text-sm font-medium text-blue-600 bg-blue-50 w-fit px-4 py-2 rounded-full border border-blue-100 animate-pulse">
-              <Sparkles size={16} /> AI is matching doctors for: "{symptoms}"
-            </div>
-          )}
+        <div className="relative max-w-xl">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+          <input 
+            type="text" 
+            placeholder="Search doctors by title or specialty..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-slate-700"
+          />
         </div>
 
-        {/* Doctors Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-          {filteredDoctors.map((doc) => (
-            <div key={doc.id} className="flex flex-col group relative">
-              {/* AI Recommended Badge */}
-              {doc.id === aiMatchId && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 bg-blue-600 text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-lg border-2 border-white flex items-center gap-1">
-                  <Sparkles size={10} fill="white" /> AI RECOMMENDED
-                </div>
-              )}
-
-              {/* Doctor Card Image */}
-              <div className={`relative aspect-square overflow-hidden rounded-3xl bg-slate-100 mb-4 ${doc.id === aiMatchId ? 'ring-4 ring-blue-600 ring-offset-2' : ''}`}>
-                <img 
-                  src={doc.image} 
-                  alt={doc.name} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                {doc.premium && (
-                  <div className="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1 rounded-lg">
-                    Premium
-                  </div>
-                )}
-              </div>
-
-              {/* Doctor Info */}
-              <div className="px-1 flex flex-col flex-1">
-                <div className="flex-1">
-                  <h3 className="font-bold text-slate-900 text-lg mb-1 truncate">
-                    {doc.name}
-                  </h3>
-                  <p className="text-slate-500 text-xs leading-relaxed mb-4 flex-1 mt-auto">
-                    {doc.desc}
-                  </p>
-                </div>
-                
-                <Link href={`/consultation?name=${encodeURIComponent(doc.name)}&image=${encodeURIComponent(doc.image)}`} className="mt-auto">
-                  <button className={`w-full py-3 rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 ${doc.id === aiMatchId ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-slate-900 text-white hover:bg-blue-600'}`}>
-                    Start Consultation {doc.id === aiMatchId && <ArrowRight size={16} />}
-                  </button>
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* AI Recommendation Placeholder */}
-        {filteredDoctors.length === 0 && (
-          <div className="text-center py-20">
-            <Activity className="mx-auto text-slate-200 mb-4" size={48} />
-            <p className="text-slate-500">No matching specialists found. Try another search or use our AI matching.</p>
+        {symptoms && (
+          <div className="mt-4 flex items-center gap-2 text-sm font-medium text-blue-600 bg-blue-50 w-fit px-4 py-2 rounded-full border border-blue-100 animate-pulse">
+            <Sparkles size={16} /> AI is matching doctors for: "{symptoms}"
           </div>
         )}
       </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        {filteredDoctors.map((doc) => (
+          <div key={doc.id} className="flex flex-col group relative">
+            {doc.id === aiMatchId && (
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 bg-blue-600 text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-lg border-2 border-white flex items-center gap-1">
+                <Sparkles size={10} fill="white" /> AI RECOMMENDED
+              </div>
+            )}
+
+            <div className={`relative aspect-square overflow-hidden rounded-3xl bg-slate-100 mb-4 ${doc.id === aiMatchId ? 'ring-4 ring-blue-600 ring-offset-2' : ''}`}>
+              <img 
+                src={doc.image} 
+                alt={doc.name} 
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              {doc.premium && (
+                <div className="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1 rounded-lg">
+                  Premium
+                </div>
+              )}
+            </div>
+
+            <div className="px-1 flex flex-col flex-1">
+              <div className="flex-1">
+                <h3 className="font-bold text-slate-900 text-lg mb-1 truncate">
+                  {doc.name}
+                </h3>
+                <p className="text-slate-500 text-xs leading-relaxed mb-4 flex-1 mt-auto">
+                  {doc.desc}
+                </p>
+              </div>
+              
+              <Link href={`/consultation?name=${encodeURIComponent(doc.name)}&image=${encodeURIComponent(doc.image)}`} className="mt-auto">
+                <button className={`w-full py-3 rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 ${doc.id === aiMatchId ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-slate-900 text-white hover:bg-blue-600'}`}>
+                  Start Consultation {doc.id === aiMatchId && <ArrowRight size={16} />}
+                </button>
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {filteredDoctors.length === 0 && (
+        <div className="text-center py-20">
+          <Activity className="mx-auto text-slate-200 mb-4" size={48} />
+          <p className="text-slate-500">No matching specialists found.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Main Page Export wrapping the content in Suspense
+export default function DoctorsPage() {
+  return (
+    <div className="min-h-screen bg-white pt-24 pb-20 px-6">
+      <Suspense fallback={
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      }>
+        <DoctorsContent />
+      </Suspense>
     </div>
   );
 }
